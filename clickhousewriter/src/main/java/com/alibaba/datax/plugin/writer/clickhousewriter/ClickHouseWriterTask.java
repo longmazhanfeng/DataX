@@ -4,8 +4,6 @@ import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +12,8 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.writer.CommonRdbmsWriter;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -147,7 +147,7 @@ public class ClickHouseWriterTask extends CommonRdbmsWriter.Task{
                     preparedStatement.setString(columnIndex + 1, column.asString());
                 }
                 break;
-
+            // 建议在reader处将array格式化为JSONString
             case Types.ARRAY:
                 Connection conn = preparedStatement.getConnection();
                 List<Object> values = JSON.parseArray(column.asString(), Object.class);
@@ -157,24 +157,27 @@ public class ClickHouseWriterTask extends CommonRdbmsWriter.Task{
                 Array array = conn.createArrayOf("String", values.toArray());
                 preparedStatement.setArray(columnIndex + 1, array);
                 break;
+            // Map
+            case Types.STRUCT:
             case Types.OTHER:
                 // 处理ck其他类型
                 // 1.Map类型
-                if (this.dataBaseType == DataBaseType.ClickHouse) {
-                    String columnStr = column.asString();
-                    // 处理空map
-                    if (column.getByteSize() == 2 && columnStr.equals("{}")) {
-                        preparedStatement.setObject(columnIndex + 1, null);
-                    }
-                    // 处理正常map
-                    else if (column.getByteSize() > 2 && columnStr.startsWith("{") && columnStr.endsWith("}")){
-                        Map newMap = JSONObject.parseObject(columnStr, Map.class);
-                        preparedStatement.setObject(columnIndex + 1, newMap);
-                    }
-                    // 其他情况按照字符串处理
-                    else {
-                        preparedStatement.setObject(columnIndex + 1, columnStr);
-                    }
+                String columnStr = column.asString();
+                // 打印调试日志
+//                LOG.info("columnStr: " + columnStr);
+                // 处理空map
+                if (column.getByteSize() == 2 && columnStr.equals("{}")) {
+                    preparedStatement.setObject(columnIndex + 1, null);
+                }
+                // 处理正常map {ip_upload=112.24.212.155, ad_network=TP, msChannel=pjzjdmn_m}
+                // 建议在reader处将map格式化为JSONString
+                else if (column.getByteSize() > 2 && columnStr.startsWith("{") && columnStr.endsWith("}")) {
+                    Map newMap = JSONObject.parseObject(columnStr, Map.class);
+                    preparedStatement.setObject(columnIndex + 1, newMap);
+                }
+                // 其他情况按照字符串处理
+                else {
+                    preparedStatement.setObject(columnIndex + 1, columnStr);
                 }
                 break;
             default:

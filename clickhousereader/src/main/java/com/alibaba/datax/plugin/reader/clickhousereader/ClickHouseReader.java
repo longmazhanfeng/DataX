@@ -63,31 +63,31 @@ public class ClickHouseReader extends Reader {
 
         private Configuration taskConfig;
 
-        private CommonRdbmsReader.Task commonRdbmsReaderMaster;
+        private ClickHouseReaderTask clickHouseReaderTask;
 
 
         @Override
         public void init() {
             this.taskConfig = super.getPluginJobConf();
-            commonRdbmsReaderMaster = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
-            commonRdbmsReaderMaster.init(taskConfig);
+            clickHouseReaderTask = new ClickHouseReaderTask(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
+            clickHouseReaderTask.init(taskConfig);
             LOG.info("ClickHouseReader Task初始化成功");
         }
 
         @Override
         public void destroy() {
-            commonRdbmsReaderMaster.destroy(taskConfig);
+            clickHouseReaderTask.destroy(taskConfig);
         }
 
         @Override
         public void startRead(RecordSender recordSender) {
             int fetchSize = this.taskConfig.getInt(Constant.FETCH_SIZE);
-            commonRdbmsReaderMaster.startRead(taskConfig, recordSender, super.getTaskPluginCollector(), fetchSize);
+            clickHouseReaderTask.startRead(taskConfig, recordSender, super.getTaskPluginCollector(), fetchSize);
         }
 
         @Override
         public void post() {
-            commonRdbmsReaderMaster.post(taskConfig);
+            clickHouseReaderTask.post(taskConfig);
         }
     }
 
