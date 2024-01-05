@@ -1,18 +1,16 @@
 {
   "name": "clickhousereader",
   "parameter": {
-    "username": "reade",
-    "password": "1234",
+    "username": "username",
+    "password": "password",
+    "column": ["col1", "col2", "col3"],
     "connection": [
       {
-        "jdbcUrl": [
-          "jdbc:clickhouse://host:8123/db"
-        ],
-        "querySql": [
-          "select * from xxtable where ds='2022-06-01' "
-        ]
+        "jdbcUrl": "jdbc:clickhouse://<host>:<port>[/<database>]",
+        "table": ["table1", "table2"]
       }
     ],
-    "fetchSize": 100
+    "preSql": [],
+    "postSql": []
   }
 }
