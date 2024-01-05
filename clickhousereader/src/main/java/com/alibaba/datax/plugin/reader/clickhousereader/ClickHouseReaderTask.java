@@ -1,24 +1,20 @@
 package com.alibaba.datax.plugin.reader.clickhousereader;
 
-import java.sql.*;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Types;
 
-import com.alibaba.datax.common.element.*;
-import com.alibaba.datax.common.plugin.RecordSender;
-import com.alibaba.datax.common.plugin.TaskPluginCollector;
-import com.alibaba.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.datax.common.element.*;
 import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.common.plugin.RecordSender;
+import com.alibaba.datax.common.plugin.TaskPluginCollector;
+import com.alibaba.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
-import com.alibaba.datax.plugin.rdbms.writer.CommonRdbmsWriter;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author : donghao
